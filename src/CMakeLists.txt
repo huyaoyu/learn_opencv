@@ -11,7 +11,7 @@ add_compile_options(-std=c++11)
 ## Your package locations should be listed before other locations
 
 SET( PROJECT_INCLUDES "../include" )
-SET( OPENCV_ROOT "/home/yyhu/Libraries/opencv-install-d" )
+SET( OPENCV_ROOT "$ENV{OPENCV_ROOT}" )
 SET( OPENCV_INCLUDES "${OPENCV_ROOT}/include" )
 SET( OPENCV_LIBS "${OPENCV_ROOT}/lib" )
 
@@ -54,7 +54,7 @@ add_executable(${PROJECT_NAME}_exe ${SRC_LIST})
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 
-FIND_LIBRARY( LIB_OPENCV_CORE NAMES opencv_core PATHS ${OPENCV_LIBS} NO_DEFAULT_PATH NO_CMAKE_ENVIRONMENT_PATH NO_CMAKE_PATH NO_SYSTEM_ENVIRONMENT_PATH NO_CMAKE_SYSTEM_PATH)
+FIND_LIBRARY( LIB_OPENCV_CORE NAMES opencv_core PATHS ${OPENCV_LIBS} NO_DEFAULT_PATH )
 FIND_LIBRARY( LIB_OPENCV_HIGHGUI NAMES opencv_highgui PATHS ${OPENCV_LIBS} NO_DEFAULT_PATH )
 FIND_LIBRARY( LIB_OPENCV_IMGPROC NAMES opencv_imgproc PATHS ${OPENCV_LIBS} NO_DEFAULT_PATH )
 FIND_LIBRARY( LIB_BOOST_EXCEPTION NAMES boost_exception )
