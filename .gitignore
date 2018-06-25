@@ -1,0 +1,9 @@
+*.pyc
+*.dat
+*.zip
+build/
+builddir/
+.cproject
+.project
+.settings/
+
