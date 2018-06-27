@@ -6,4 +6,6 @@ builddir/
 .cproject
 .project
 .settings/
+data/
+output/
 
