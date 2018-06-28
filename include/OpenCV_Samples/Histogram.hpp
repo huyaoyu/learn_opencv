@@ -18,17 +18,12 @@ class Run_OCV_Histogram : public Runnable
 {
 public:
 	Run_OCV_Histogram();
-	Run_OCV_Histogram(std::string& name);
-	Run_OCV_Histogram(const std::string& name);
 	~Run_OCV_Histogram();
 
 	Runnable::RES_t run(void);
 
 private:
 	Runnable::RES_t runSample(void);
-
-public:
-	const std::string DEFAULT_NAME;
 };
 
 }

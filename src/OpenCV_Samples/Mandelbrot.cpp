@@ -98,25 +98,8 @@ void sequentialMandelbrot(Mat &img, const float x1, const float y1, const float 
 }
 //! [mandelbrot-sequential]
 
-
-
 Run_OCV_Mandelbrot::Run_OCV_Mandelbrot()
-: DEFAULT_NAME("OpenCV_Samples_Mandelbrot"),
-  Runnable(DEFAULT_NAME)
-{
-
-}
-
-Run_OCV_Mandelbrot::Run_OCV_Mandelbrot(const std::string& name)
-: DEFAULT_NAME("OpenCV_Samples_Mandelbrot"),
-  Runnable(name)
-{
-
-}
-
-Run_OCV_Mandelbrot::Run_OCV_Mandelbrot(std::string& name)
-: DEFAULT_NAME("OpenCV_Samples_Mandelbrot"),
-  Runnable(name)
+: Runnable("OpenCV_Samples_Mandelbrot")
 {
 
 }

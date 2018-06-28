@@ -21,17 +21,12 @@ class Run_OCV_Smoothing : public Runnable
 {
 public:
 	Run_OCV_Smoothing();
-	Run_OCV_Smoothing(std::string& name);
-	Run_OCV_Smoothing(const std::string& name);
 	~Run_OCV_Smoothing();
 
 	Runnable::RES_t run(void);
 
 private:
 	Runnable::RES_t runSample(void);
-
-public:
-	const std::string DEFAULT_NAME;
 
 private:
 	/// File-wise variables

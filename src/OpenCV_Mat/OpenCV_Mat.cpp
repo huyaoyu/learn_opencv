@@ -14,22 +14,7 @@
 using namespace locv;
 
 Run_OpenCV_Mat::Run_OpenCV_Mat()
-: DEFAULT_NAME("OpenCV_Mat"),
-  Runnable(DEFAULT_NAME)
-{
-
-}
-
-Run_OpenCV_Mat::Run_OpenCV_Mat(std::string& name)
-: DEFAULT_NAME("OpenCV_Mat"),
-  Runnable(name)
-{
-
-}
-
-Run_OpenCV_Mat::Run_OpenCV_Mat(const std::string& name)
-: DEFAULT_NAME("OpenCV_Mat"),
-  Runnable(name)
+: Runnable("OpenCV_Mat")
 {
 
 }

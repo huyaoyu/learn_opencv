@@ -46,26 +46,7 @@ static int display_caption( const std::string& caption , const std::string& winN
 // ========= Class members. ===============
 
 Run_OCV_Smoothing::Run_OCV_Smoothing()
-: DEFAULT_NAME("OpenCV_Samples_Smoothing"),
-  Runnable(DEFAULT_NAME),
-  DELAY_CAPTION(1000), DELAY_BLUR(50), MAX_KERNEL_LENGTH(31),
-  window_name("Smoothing Demo"), filename("../data/Landscape.jpg")
-{
-
-}
-
-Run_OCV_Smoothing::Run_OCV_Smoothing(const std::string& name)
-: DEFAULT_NAME("OpenCV_Samples_Smoothing"),
-  Runnable(name),
-  DELAY_CAPTION(1000), DELAY_BLUR(50), MAX_KERNEL_LENGTH(31),
-  window_name("Smoothing Demo"), filename("../data/Landscape.jpg")
-{
-
-}
-
-Run_OCV_Smoothing::Run_OCV_Smoothing(std::string& name)
-: DEFAULT_NAME("OpenCV_Samples_Smoothing"),
-  Runnable(name),
+: Runnable("OpenCV_Samples_Smoothing"),
   DELAY_CAPTION(1000), DELAY_BLUR(50), MAX_KERNEL_LENGTH(31),
   window_name("Smoothing Demo"), filename("../data/Landscape.jpg")
 {

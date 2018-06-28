@@ -1,0 +1,29 @@
+/*
+ * MutualInformation.hpp
+ *
+ *  Created on: Jun 28, 2018
+ *      Author: yyhu
+ */
+
+#ifndef INCLUDE_MUTUALINFORMATION_MUTUALINFORMATION_HPP_
+#define INCLUDE_MUTUALINFORMATION_MUTUALINFORMATION_HPP_
+
+#include "Runnable/Runnable.hpp"
+
+namespace locv
+{
+
+class Run_MutualInformation : public Runnable
+{
+public:
+	Run_MutualInformation();
+	~Run_MutualInformation();
+
+	Runnable::RES_t run(void);
+};
+
+}
+
+
+
+#endif /* INCLUDE_MUTUALINFORMATION_MUTUALINFORMATION_HPP_ */

@@ -20,14 +20,9 @@ class Run_OpenCV_Mat : public Runnable
 {
 public:
 	Run_OpenCV_Mat();
-	Run_OpenCV_Mat(std::string& name);
-	Run_OpenCV_Mat(const std::string& name);
 	~Run_OpenCV_Mat();
 
 	Runnable::RES_t run(void);
-
-public:
-	const std::string DEFAULT_NAME;
 };
 
 }

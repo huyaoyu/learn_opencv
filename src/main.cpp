@@ -10,13 +10,15 @@
 
 #include <opencv2/opencv.hpp>
 
+#include "MutualInformation/MutualInformation.hpp"
+
 #include "OpenCV_Mat/OpenCV_Mat.hpp"
 #include "OpenCV_Samples/Histogram.hpp"
 #include "OpenCV_Samples/Mandelbrot.hpp"
 #include "OpenCV_Samples/Smoothing.hpp"
 
 #define CREATE_ADD_OBJECT(c, n, v) \
-	c n(#n);\
+	c n;\
 	v.push_back( &n );
 
 int main(void)
@@ -28,15 +30,18 @@ int main(void)
 
 //	// Create a new object.
 //	CREATE_ADD_OBJECT(locv::Run_OpenCV_Mat, runOpenCVMat, vecRunnables);
-
+//
 //	// Create a Smoothing object.
 //	CREATE_ADD_OBJECT(locv::Run_OCV_Smoothing, runOCVSmoothing, vecRunnables);
-
+//
 //	// Create a Mandelbrot object.
 //	CREATE_ADD_OBJECT(locv::Run_OCV_Mandelbrot, runOCVMandelbrot, vecRunnables);
+//
+//	// Create a Histogram object.
+//	CREATE_ADD_OBJECT(locv::Run_OCV_Histogram, runOCVHistogram, vecRunnables);
 
-	// Create a Histogram object.
-	CREATE_ADD_OBJECT(locv::Run_OCV_Histogram, runOCVHistogram, vecRunnables);
+	// Create a MutualInformation object.
+	CREATE_ADD_OBJECT(locv::Run_MutualInformation, runMutualInformation, vecRunnables);
 
 	// Run the Runnable object.
 	std::vector<locv::Runnable*>::iterator iter;

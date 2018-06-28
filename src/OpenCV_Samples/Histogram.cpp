@@ -19,22 +19,7 @@ using namespace cv;
 using namespace locv;
 
 Run_OCV_Histogram::Run_OCV_Histogram()
-: DEFAULT_NAME("OpenCV_Samples_Smoothing"),
-  Runnable(DEFAULT_NAME)
-{
-
-}
-
-Run_OCV_Histogram::Run_OCV_Histogram(const std::string& name)
-: DEFAULT_NAME("OpenCV_Samples_Smoothing"),
-  Runnable(name)
-{
-
-}
-
-Run_OCV_Histogram::Run_OCV_Histogram(std::string& name)
-: DEFAULT_NAME("OpenCV_Samples_Smoothing"),
-  Runnable(name)
+: Runnable("OpenCV_Samples_Histogram")
 {
 
 }
