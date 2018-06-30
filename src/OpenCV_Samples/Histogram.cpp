@@ -45,7 +45,8 @@ Runnable::RES_t Run_OCV_Histogram::runSample(void)
 	Mat src, dst;
 
 	/// Load image
-	String imageName( "../data/Landscape.jpg" ); // by default
+//	String imageName( "../data/Landscape.jpg" ); // by default
+	String imageName( "../data/MutualInformation/left.bmp" ); // by default
 
 	src = imread( imageName, IMREAD_COLOR );
 
@@ -70,10 +71,25 @@ Runnable::RES_t Run_OCV_Histogram::runSample(void)
 
 	Mat b_hist, g_hist, r_hist;
 
+//	int tempArray[] = {0};
+
 	/// Compute the histograms:
 	calcHist( &bgr_planes[0], 1, 0, Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate );
+//	calcHist( &src,           1, tempArray, Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate );
 	calcHist( &bgr_planes[1], 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate );
 	calcHist( &bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate );
+
+	Mat twoDimHist;
+	int twoChannelIdx[] = {0, 1};
+	int twoDimHistSize[] = {256, 256};
+	float range0[] = {0, 256};
+	float range1[] = {0, 256};
+	const float* ranges[] = { range0, range1 };
+
+//	calcHist( &src, 1, twoChannelIdx, Mat(), twoDimHist, 2, twoDimHistSize, ranges, uniform, accumulate);
+
+	Mat matArray[] = { bgr_planes[0], bgr_planes[1] };
+	calcHist( matArray, 2, twoChannelIdx, Mat(), twoDimHist, 2, twoDimHistSize, ranges, uniform, accumulate);
 
 	// Draw the histograms for B, G and R
 	int hist_w = 512; int hist_h = 400;
@@ -103,6 +119,11 @@ Runnable::RES_t Run_OCV_Histogram::runSample(void)
 	/// Display
 	namedWindow("calcHist Demo", WINDOW_AUTOSIZE );
 	imshow("calcHist Demo", histImage );
+
+	namedWindow("Two dimensional histogram", WINDOW_AUTOSIZE);
+	imshow("Two dimensional histogram", twoDimHist);
+
+//	cout << twoDimHist << endl;
 
 	cout << "Please close the histogram window." << endl;
 

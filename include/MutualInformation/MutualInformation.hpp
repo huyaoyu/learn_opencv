@@ -16,6 +16,9 @@ namespace locv
 class Run_MutualInformation : public Runnable
 {
 public:
+	typedef float real;
+
+public:
 	Run_MutualInformation();
 	~Run_MutualInformation();
 
