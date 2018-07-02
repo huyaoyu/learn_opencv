@@ -28,7 +28,9 @@ Run_MutualInformation::~Run_MutualInformation()
 
 }
 
-static void show_floating_point_number_image(cv::InputArray _src, const std::string& winName)
+const float SMALL_VALUE = 1e-30;
+
+static void show_floating_point_number_image(cv::InputArray _src, const std::string& winName, const char* outPathFileName = NULL)
 {
 	cv::Mat src = _src.getMat();
 
@@ -41,6 +43,13 @@ static void show_floating_point_number_image(cv::InputArray _src, const std::str
 	cv::minMaxLoc(shifted, &minV, &maxV);
 
 	cv::imshow(winName.c_str(), shifted);
+
+	if ( NULL != outPathFileName )
+	{
+		cv::Mat converted = shifted * 255;
+//		converted.convertTo(converted, CV_8UC1);
+		cv::imwrite(outPathFileName, converted);
+	}
 }
 
 template<typename T>
@@ -146,7 +155,37 @@ static int warp(cv::InputArray _src, cv::InputArray _D, cv::OutputArray _dst)
 	return 0;
 }
 
-static void mutual_information(cv::InputArray _s1, cv::InputArray _s2, cv::OutputArray _dst, int intensityBins = 256)
+static void mi_ik(cv::InputArray _h1, cv::InputArray _h2, cv::InputArray _h12, cv::OutputArray _mi)
+{
+	cv::Mat h1  = _h1.getMat();
+	cv::Mat h2  = _h2.getMat();
+	cv::Mat h12 = _h12.getMat();
+
+	_mi.create( h12.rows, h12.cols, CV_32FC1 );
+	cv::Mat mi = _mi.getMat();
+
+	Run_MutualInformation::real h1i   = 0.0;
+	Run_MutualInformation::real h2k   = 0.0;
+	Run_MutualInformation::real hik   = 0.0;
+	Run_MutualInformation::real mi_ik = 0.0;
+
+	for ( int i = 0; i < h12.rows; ++i )
+	{
+		h1i = h1.at<Run_MutualInformation::real>(i);
+
+		for ( int j = 0; j < h12.cols; ++j )
+		{
+			h2k = h2.at<Run_MutualInformation::real>(j);
+			hik = h12.at<Run_MutualInformation::real>(i, j);
+
+			mi_ik = h1i + h2k - hik;
+
+			mi.at<Run_MutualInformation::real>(i, j) = mi_ik;
+		}
+	}
+}
+
+static void mutual_information(cv::InputArray _s1, cv::InputArray _s2, cv::OutputArray _dst, int intensityBins = 256, int widthGF = 7)
 {
 	// === Get the Mat objects. ===
 	cv::Mat s1 = _s1.getMat();
@@ -164,35 +203,63 @@ static void mutual_information(cv::InputArray _s1, cv::InputArray _s2, cv::Outpu
 	const Run_MutualInformation::real* ranges[] = {range0, range1};
 
 	cv::calcHist( inputMats, 2, channels, cv::Mat(), histDst, 2, histSize, ranges, true, false);
+//	int dataType = histDst.type();
+//	show_floating_point_number_image(histDst, "Histogram");
 
 	int imageSize = s1.rows * s1.cols;
 	Run_MutualInformation::real f = 1.0 / imageSize;
 
 	histDst *= f;
 
+	cv::Mat p1, p2;
+
+	cv::reduce(histDst, p1, 1, CV_REDUCE_SUM, CV_32FC1);
+	cv::reduce(histDst, p2, 0, CV_REDUCE_SUM, CV_32FC1);
+
 	// === Gaussian convolution with GaussianBlur. ===
 	cv::Mat GBDst;
-//	cv::GaussianBlur( histDst, GBDst, cv::Size( 7, 7 ), 0, 0, cv::BORDER_CONSTANT );
-	cv::GaussianBlur( histDst, GBDst, cv::Size( 7, 7 ), 0, 0 );
+//	cv::GaussianBlur( histDst, GBDst, cv::Size( widthGF, widthGF ), 0, 0, cv::BORDER_CONSTANT );
+	cv::GaussianBlur( histDst, GBDst, cv::Size( widthGF, widthGF ), 0, 0, cv::BORDER_ISOLATED );
+
+	cv::Mat GBP1, GBP2;
+	cv::GaussianBlur( p1, GBP1, cv::Size(widthGF, 1), 0, 0, cv::BORDER_ISOLATED );
+	cv::GaussianBlur( p2, GBP2, cv::Size(1, widthGF), 0, 0, cv::BORDER_ISOLATED );
 
 	// === Logarithm. ===
 	cv::Mat logDst;
 	// Direct log() without any modification for the zero value in GBDst will cause problem.
 	// The current version of OpenCV, 3.4.1, behaves differently with the 2.x version.
 	// cv::log() gaves undefined value if the input is negative, zero, NaN and Inf.
-	flush_small_positive_values<Run_MutualInformation::real>(GBDst, 1e-20);
+	flush_small_positive_values<Run_MutualInformation::real>(GBDst, SMALL_VALUE);
 	cv::log( GBDst, logDst );
 	logDst *= -1;
 
+	cv::Mat logP1, logP2;
+	flush_small_positive_values<Run_MutualInformation::real>(GBP1, SMALL_VALUE);
+	flush_small_positive_values<Run_MutualInformation::real>(GBP2, SMALL_VALUE);
+	cv::log(GBP1, logP1);
+	cv::log(GBP2, logP2);
+	logP1 *= -1;
+	logP2 *= -1;
+
 	// === Gaussian convolution with GaussianBlur, again. ===
-//	cv::GaussianBlur( logDst, GBDst, cv::Size( 7, 7), 0, 0, cv::BORDER_CONSTANT );
-	cv::GaussianBlur( logDst, GBDst, cv::Size( 7, 7), 0, 0 );
+//	cv::GaussianBlur( logDst, GBDst, cv::Size( widthGF, widthGF), 0, 0, cv::BORDER_CONSTANT );
+	cv::GaussianBlur( logDst, GBDst, cv::Size( widthGF, widthGF), 0, 0, cv::BORDER_ISOLATED );
+
+	cv::GaussianBlur( logP1, GBP1, cv::Size(widthGF, 1), 0, 0, cv::BORDER_ISOLATED );
+	cv::GaussianBlur( logP2, GBP2, cv::Size(1, widthGF), 0, 0, cv::BORDER_ISOLATED );
 
 	// === Divide by the size of the image. ===
 	GBDst *= f;
+	GBP1  *= f;
+	GBP2  *= f;
+
+	cv::Mat mi;
+
+	mi_ik(GBP1, GBP2, GBDst, mi);
 
 	// === Preserve the result. ===
-	_dst.assign(GBDst);
+	_dst.assign(mi);
 
 	std::cout << "Test output." << std::endl;
 }
@@ -238,7 +305,7 @@ Runnable::RES_t Run_MutualInformation::run(void)
 	cv::Mat D;      // Disparity.
 	cv::Mat mi;
 
-	if ( 0 != put_initial_disparity_map( greyImgs[0].rows, greyImgs[0].cols, D, 300.0, CV_32FC1 ) )
+	if ( 0 != put_initial_disparity_map( greyImgs[0].rows, greyImgs[0].cols, D, 600.0, CV_32FC1 ) )
 	{
 		std::cout << "Error!" << std::endl;
 		goto ERROR_POINT;
@@ -255,8 +322,7 @@ Runnable::RES_t Run_MutualInformation::run(void)
 
 	mutual_information( greyImgs[0], warped, mi );
 
-	show_floating_point_number_image(mi, "mi");
-
+	show_floating_point_number_image(mi, "mi", "../output/MutualInformation/mi.bmp");
 
 ERROR_POINT:
 	cv::waitKey(0);
