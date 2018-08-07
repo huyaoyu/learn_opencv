@@ -10,6 +10,11 @@
 
 #include <vector>
 
+#include "opencv2/core.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/imgproc.hpp"
+
 #include "Runnable/Runnable.hpp"
 
 namespace locv
@@ -44,7 +49,9 @@ public:
     void set_n_angles(int n);
 
 protected:
-    Runnable::RES_t put_sides( Vec_t& r, Side_t& s0, Side_t& s1 );
+    Runnable::RES_t put_sides( const Vec_t& r, Side_t& s0, Side_t& s1 );
+    void interpolate_along_r(const Vec_t& r, Vec_t& dxdy);
+    void draw_along_r(cv::OutputArray _image, const Vec_t& r, const cv::Point& p, int h, int w, const cv::Scalar& color, bool reverse = false);
 
 public:
     const int IDX_H; // Height index.

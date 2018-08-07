@@ -34,6 +34,8 @@ public:
 	void set_name(std::string& name);
 	std::string& get_name(void);
 
+	static void show_size_of_types(void);
+
 protected:
 	void show_header(void);
 	void show_footer(void);

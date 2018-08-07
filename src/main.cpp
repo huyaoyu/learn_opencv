@@ -26,6 +26,9 @@ int main(void)
 {
 	std::cout << "Hello OpenCV!" << std::endl;
 
+	// Show sizes of types.
+	locv::Runnable::show_size_of_types();
+
 	// Create a vector.
 	std::vector<locv::Runnable*> vecRunnables;
 

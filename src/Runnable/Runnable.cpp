@@ -50,3 +50,20 @@ Runnable::RES_t Runnable::run(void)
 {
 	return Runnable::OK;
 }
+
+void Runnable::show_size_of_types(void)
+{
+	std::cout << "The size of types: " << std::endl;
+
+	std::cout << "sizeof(char)      = " << sizeof(char) << std::endl;
+	std::cout << "sizeof(uchar)     = " << sizeof(unsigned char) << std::endl;
+	std::cout << "sizeof(int)       = " << sizeof(int) << std::endl;
+	std::cout << "sizeof(uint)      = " << sizeof(uint) << std::endl;
+	std::cout << "sizeof(short)     = " << sizeof(short) << std::endl;
+	std::cout << "sizeof(ushort)    = " << sizeof(ushort) << std::endl;
+	std::cout << "sizeof(long)      = " << sizeof(long) << std::endl;
+	std::cout << "sizeof(ulong)     = " << sizeof(unsigned long) << std::endl;
+	std::cout << "sizeof(long long) = " << sizeof(long long) << std::endl;
+	std::cout << "sizeof(float)     = " << sizeof(float) << std::endl;
+	std::cout << "sizeof(double)    = " << sizeof(float) << std::endl;
+}
