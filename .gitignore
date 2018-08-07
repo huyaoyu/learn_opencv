@@ -8,4 +8,5 @@ builddir/
 .settings/
 data/
 output/
-
+*.code-workspace
+.vscode/
