@@ -28,7 +28,7 @@ Run_MutualInformation::~Run_MutualInformation()
 
 }
 
-const float SMALL_VALUE = 1e-30;
+const float SMALL_VALUE_LOG = 1e-30;
 
 static void show_floating_point_number_image(cv::InputArray _src, const std::string& winName, const char* outPathFileName = NULL)
 {
@@ -230,13 +230,13 @@ static void mutual_information(cv::InputArray _s1, cv::InputArray _s2, cv::Outpu
 	// Direct log() without any modification for the zero value in GBDst will cause problem.
 	// The current version of OpenCV, 3.4.1, behaves differently with the 2.x version.
 	// cv::log() gaves undefined value if the input is negative, zero, NaN and Inf.
-	flush_small_positive_values<Run_MutualInformation::real>(GBDst, SMALL_VALUE);
+	flush_small_positive_values<Run_MutualInformation::real>(GBDst, SMALL_VALUE_LOG);
 	cv::log( GBDst, logDst );
 	logDst *= -1;
 
 	cv::Mat logP1, logP2;
-	flush_small_positive_values<Run_MutualInformation::real>(GBP1, SMALL_VALUE);
-	flush_small_positive_values<Run_MutualInformation::real>(GBP2, SMALL_VALUE);
+	flush_small_positive_values<Run_MutualInformation::real>(GBP1, SMALL_VALUE_LOG);
+	flush_small_positive_values<Run_MutualInformation::real>(GBP2, SMALL_VALUE_LOG);
 	cv::log(GBP1, logP1);
 	cv::log(GBP2, logP2);
 	logP1 *= -1;

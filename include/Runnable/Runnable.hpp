@@ -12,6 +12,8 @@
 #include <string>
 #include <sstream>
 
+#include "LOCVException/LOCVException.hpp"
+
 namespace locv
 {
 

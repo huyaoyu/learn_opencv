@@ -12,6 +12,7 @@
 
 #include "InterpolationForStereo/InterpolationForStereo.hpp"
 #include "MutualInformation/MutualInformation.hpp"
+#include "StereoDisparity/StereoDisparity.hpp"
 
 #include "OpenCV_Mat/OpenCV_Mat.hpp"
 #include "OpenCV_Samples/Histogram.hpp"
@@ -47,9 +48,12 @@ int main(void)
 	// // Create a MutualInformation object.
 	// CREATE_ADD_OBJECT(locv::Run_MutualInformation, runMutualInformation, vecRunnables);
 
-	// Create a InterpolationForStereo objec.
-	CREATE_ADD_OBJECT(locv::Run_InterpolationForStereo, runInterpolationForStereo, vecRunnables);
-	runInterpolationForStereo.set_image_size(3008, 4112);
+	// // Create a InterpolationForStereo objec.
+	// CREATE_ADD_OBJECT(locv::Run_InterpolationForStereo, runInterpolationForStereo, vecRunnables);
+	// runInterpolationForStereo.set_image_size(3008, 4112);
+
+	// Create a StereoDisparity objec.
+	CREATE_ADD_OBJECT(locv::Run_StereoDisparity, runStrereoDisparity, vecRunnables);
 
 	// Run the Runnable object.
 	std::vector<locv::Runnable*>::iterator iter;
