@@ -13,6 +13,7 @@
 #include <sstream>
 
 #include "LOCVException/LOCVException.hpp"
+#include "BulkMem/BulkMem.hpp"
 
 namespace locv
 {

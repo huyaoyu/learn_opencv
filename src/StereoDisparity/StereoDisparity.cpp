@@ -342,6 +342,82 @@ Runnable::RES_t Run_StereoDisparity::put_sides( const Vec_t& r, Side_t& s0, Side
     return Runnable::OK;
 }
 
+void Run_StereoDisparity::put_starting_points( const Vec_t& r, int H, int W, Vec_t* buffer, int& n )
+{
+    // Get the two possible sides.
+	Side_t s0, s1;
+	put_sides(r, s0, s1);
+
+	int idxBuffer = 0;
+	n = 0;
+
+	switch(s0)
+	{
+		case SIDE_0:
+		{
+			for( int i = 0; i < W; ++i ) { buffer[idxBuffer].x = i; buffer[idxBuffer].y = 0; idxBuffer++; }
+			break;
+		}
+		case SIDE_1:
+		{
+			for( int i = 0; i < H; ++i ) { buffer[idxBuffer].x = 0; buffer[idxBuffer].y = i; idxBuffer++; }
+			break;
+		}
+		case SIDE_2:
+		{
+			for( int i = W - 1; i > 0; --i ) { buffer[idxBuffer].x = i; buffer[idxBuffer].y = 0; idxBuffer++; }
+			break;
+		}
+		case SIDE_3:
+		{
+			for( int i = H - 1; i > 0; --i ) { buffer[idxBuffer].x = 0; buffer[idxBuffer].y = i; idxBuffer++; }
+			break;
+		}
+		default:
+		{
+			// Should never reach here.
+		}
+	}
+
+	n += idxBuffer;
+
+	if ( s1 == s0 )
+	{
+		// That's it. 
+		return;
+	}
+
+	idxBuffer = n;
+
+	switch(s1)
+	{
+		case SIDE_0:
+		{
+			for( int i = 0; i < W; ++i ) { buffer[idxBuffer].x = i; buffer[idxBuffer].y = 0; idxBuffer++; }
+			break;
+		}
+		case SIDE_1:
+		{
+			for( int i = 0; i < H; ++i ) { buffer[idxBuffer].x = 0; buffer[idxBuffer].y = i; idxBuffer++; }
+			break;
+		}
+		case SIDE_2:
+		{
+			for( int i = W - 1; i > 0; --i ) { buffer[idxBuffer].x = i; buffer[idxBuffer].y = 0; idxBuffer++; }
+			break;
+		}
+		case SIDE_3:
+		{
+			for( int i = H - 1; i > 0; --i ) { buffer[idxBuffer].x = 0; buffer[idxBuffer].y = i; idxBuffer++; }
+			break;
+		}
+		default:
+		{
+			// Should never reach here.
+		}
+	}
+}
+
 void Run_StereoDisparity::interpolate_along_r(const Vec_t& r, Vec_t& dxdy)
 {
     real frx = fabs(r.x);
@@ -457,22 +533,57 @@ void Run_StereoDisparity::disparity_by_mutual_information(
 	// img0.
 	cv::Mat img0 = _img0.getMat();
 
+	// H and W.
+	int H = img0.size[0];
+	int W = img0.size[1];
+
 	// Find all the r vectors.
 	std::vector<Vec_t> vecR;
 	put_r(vecR, nAngles);
 
+	// Helper variables.
+	D_t zeroD_t = 0;
+
 	// Buffer for S(p, d).
-	D_t* buffer_S = new D_t[ img0.size[0] * ( img0.size[1] - dMin ) * ( dMax - dMin ) ];
+	i_t bufferDimArray[1] = { H * ( W - dMin ) * ( dMax - dMin ) };
+	BulkMem<D_t> bmBuffer_S(bufferDimArray); bmBuffer_S.assign(zeroD_t);
+	D_t* buffer_S = bmBuffer_S.get();
+
+	// Buffer for staring points.
+	bufferDimArray[0] = H + W;
+	Vec_t dummyVec; dummyVec.x = 0.0; dummyVec.y = 0.0;
+	BulkMem<Vec_t> bmBuffer_StartingPoints(bufferDimArray); bmBuffer_StartingPoints.assign(dummyVec);
+	Vec_t* buffer_StartingPoints = bmBuffer_StartingPoints.get();
+
+	// Buffer for single Lr(p, d) path.
+	bufferDimArray[0] = (H + W) * ( dMax - dMin ); // This should be enough.
+	BulkMem<D_t> bmBuffer_Lrpd(bufferDimArray); bmBuffer_Lrpd.assign(zeroD_t);
+	D_t* buffer_Lrpd = bmBuffer_Lrpd.get();
+
+	// Buffer for minLr(p, d) along single r path.
+	bufferDimArray[0] = H + W; // This should be enough.
+	BulkMem<D_t> bmBuffer_minLrpd(bufferDimArray); bmBuffer_minLrpd.assign(zeroD_t);
+	D_t* buffer_minLrpd = bmBuffer_minLrpd.get();
+
+	// Buffer for process flag.
+	i_t bufferDimArray_2D[2] = { W, H };
+	BulkMem<bool> bmBuffer_procFlag(bufferDimArray_2D, 2); bmBuffer_procFlag.assign(false);
+	bool* buffer_procFlag = bmBuffer_procFlag.get();
+
+	// Buffer for C(p, d) of single p.
+	bufferDimArray[0] = dMax - dMin;
+	BulkMem<D_t> bmBuffer_Cpd_sp(bufferDimArray); bmBuffer_Cpd_sp.assign(zeroD_t);
+	D_t* buffer_Cpd_sp = bmBuffer_Cpd_sp.get();
 
 	// Iterate over r.
 	std::vector<Vec_t>::iterator iterR;
 	for ( iterR = vecR.begin(); iterR != vecR.end(); ++iterR )
 	{
-
+		
 	}
 
 	// Release resources.
-	delete [] buffer_S; buffer_S = NULL;
+	// bmBuffer_S will release memory automatically.
 }
 
 Runnable::RES_t Run_StereoDisparity::run(void)
@@ -517,6 +628,9 @@ Runnable::RES_t Run_StereoDisparity::run(void)
 		mutual_information( mGreyImgs[0], warped, mMI );
 
 		show_floating_point_number_image(mMI, "mi", "../output/StereoDisparity/mi.bmp");
+
+		cv::Mat D;
+		disparity_by_mutual_information(mGreyImgs[0], mGreyImgs[1], mMI, 900, 1060, D);
 	}
 	catch ( exception_base& exp )
 	{
@@ -524,6 +638,8 @@ Runnable::RES_t Run_StereoDisparity::run(void)
 	}
 	
 	cv::waitKey(0);
+
+	MemSize::show_memory_usage();
 
 	this->show_footer();
 

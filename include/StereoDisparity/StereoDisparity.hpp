@@ -55,6 +55,7 @@ public:
 
 protected:
     Runnable::RES_t put_sides( const Vec_t& r, Side_t& s0, Side_t& s1 );
+    void put_starting_points( const Vec_t& r, int H, int W, Vec_t* buffer, int& n );
     void interpolate_along_r(const Vec_t& r, Vec_t& dxdy);
     void draw_along_r(cv::OutputArray _image, const Vec_t& r, const cv::Point& p, int h, int w, const cv::Scalar& color, bool reverse = false);
 
